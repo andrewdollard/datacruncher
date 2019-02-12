@@ -1,5 +1,6 @@
 from constants import *
 from node_average import NodeAverage
+from node_count import NodeCount
 from node_file_scan import NodeFileScan
 from node_limit import NodeLimit
 from node_projection import NodeProjection
@@ -17,6 +18,9 @@ def process(query):
 
         elif (operator == SELECTION):
             node = NodeSelection(statement[1])
+
+        elif (operator == COUNT):
+            node = NodeCount()
 
         elif (operator == LIMIT):
             node = NodeLimit(statement[1])
@@ -45,7 +49,7 @@ def process(query):
     root_node.close()
 
 query = [
-    [ LIMIT, 3 ],
+    [ COUNT ],
     [ PROJECTION, "rating" ],
     [ SELECTION, ["movieId", EQUALS, "5000"]],
     [ FILE_SCAN, "data/ratings.csv" ],
