@@ -1,72 +1,38 @@
-PROJECTION = 'projection'
-SELECTION = 'selection'
-TEST_SCAN = 'test_scan'
-FILE_SCAN = 'file_scan'
-
-class TestScan:
-    DATA = [
-        {'movieId': 1, 'title': 'foo', 'genres': 'action'},
-        {'movieId': 2, 'title': 'bar', 'genres': 'action'},
-        {'movieId': 3, 'title': 'baz', 'genres': 'action'},
-    ]
-
-    def __init__(self):
-        self.idx = 3
-
-    def next(self):
-        self.idx -= 1
-        if (self.idx < 0):
-            return None
-        return self.DATA[self.idx]
-
-class FileScan:
-    def __init__(self, filename):
-        self.file = open(filename)
-        self.schema = self.file.readline().strip().split(',')
-
-    def next(self):
-        row = self.file.readline()
-        if row == '':
-            return None
-        row = row.strip().split(',')
-        return { self.schema[i]: row[i] for i in range(len(self.schema)) }
-
-class Projection:
-    def __init__(self, columns):
-        self.columns = columns
-
-    def set_child(self, child_node):
-        self.child = child_node
-
-    def next(self):
-        row = self.child.next()
-        if row is None:
-            return None
-        return { col: row[col] for col in self.columns }
-
+from constants import *
+from node_file_scan import NodeFileScan
+from node_test_scan import NodeTestScan
+from node_projection import NodeProjection
 
 def process(query):
     current_node = None
     root_node = None
+
     for statement in query:
         operator = statement[0]
         if (operator == PROJECTION):
-            node = Projection(statement[1:])
+            node = NodeProjection(statement[1:])
+
         elif (operator == FILE_SCAN):
-            node = FileScan('movies_head.csv')
+            node = NodeFileScan('movies_head.csv')
+
         elif (operator == TEST_SCAN):
-            node = TestScan()
+            node = NodeTestScan()
+
         if root_node is None:
             root_node = node
             current_node = node
         else:
             current_node.set_child(node)
             current_node = node
+
     result = []
     row = root_node.next()
     while row is not None:
         result.append(row)
         row = root_node.next()
+
+    root_node.close()
+
     return result
 
 query = [
