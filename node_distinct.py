@@ -11,12 +11,12 @@ class NodeDistinct(Node):
         if row is None:
             return None
 
-        hashed = hash(frozenset(row.items()))
+        hashed = frozenset(row.items())
         while hashed in self.counts:
             row = self.child.next()
             if row is None:
                 return None
-            hashed = hash(frozenset(row.items()))
+            hashed = frozenset(row.items())
 
         self.counts.add(hashed)
         return row

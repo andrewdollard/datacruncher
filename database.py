@@ -7,6 +7,7 @@ from node_limit import NodeLimit
 from node_distinct import NodeDistinct
 from node_projection import NodeProjection
 from node_selection import NodeSelection
+from node_sort import NodeSort
 from node_test_scan import NodeTestScan
 
 def process(query):
@@ -30,8 +31,9 @@ def process(query):
 
 query = [
     NodeLimit(10),
+    NodeSort('averageRating'),
     NodeAggAverage("rating", "averageRating", ["movieId"]),
-    NodeFileScan("data/ratings_head.csv" ),
+    NodeFileScan("data/ratings.csv" ),
 ]
 
 process(query)
