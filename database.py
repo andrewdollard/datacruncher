@@ -3,6 +3,7 @@ from node_average import NodeAverage
 from node_count import NodeCount
 from node_file_scan import NodeFileScan
 from node_limit import NodeLimit
+from node_distinct import NodeDistinct
 from node_projection import NodeProjection
 from node_selection import NodeSelection
 from node_test_scan import NodeTestScan
@@ -21,6 +22,9 @@ def process(query):
 
         elif (operator == COUNT):
             node = NodeCount()
+
+        elif (operator == DISTINCT):
+            node = NodeDistinct()
 
         elif (operator == LIMIT):
             node = NodeLimit(statement[1])
@@ -50,8 +54,8 @@ def process(query):
 
 query = [
     [ COUNT ],
-    [ PROJECTION, "rating" ],
-    [ SELECTION, ["movieId", EQUALS, "5000"]],
+    [ DISTINCT ],
+    [ PROJECTION, "movieId" ],
     [ FILE_SCAN, "data/ratings.csv" ],
 ]
 
