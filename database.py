@@ -1,4 +1,5 @@
 from constants import *
+from node_agg_average import NodeAggAverage
 from node_average import NodeAverage
 from node_count import NodeCount
 from node_file_scan import NodeFileScan
@@ -32,6 +33,9 @@ def process(query):
         elif (operator == AVERAGE):
             node = NodeAverage()
 
+        elif (operator == AGG_AVERAGE):
+            node = NodeAggAverage(statement[1], statement[2], statement[3])
+
         elif (operator == FILE_SCAN):
             node = NodeFileScan(statement[1:])
 
@@ -53,10 +57,8 @@ def process(query):
     root_node.close()
 
 query = [
-    [ COUNT ],
-    [ DISTINCT ],
-    [ PROJECTION, "movieId" ],
-    [ FILE_SCAN, "data/ratings.csv" ],
+    [ AGG_AVERAGE, "rating", "averageRating", ["movieId"] ],
+    [ FILE_SCAN, "data/ratings_head.csv" ],
 ]
 
 process(query)

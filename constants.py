@@ -4,6 +4,7 @@ TEST_SCAN = 'test_scan'
 FILE_SCAN = 'file_scan'
 COUNT = 'count'
 AVERAGE = 'average'
+AGG_AVERAGE = 'agg_average'
 LIMIT = 'limit'
 DISTINCT = 'distinct'
 
