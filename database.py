@@ -13,35 +13,7 @@ def process(query):
     current_node = None
     root_node = None
 
-    for statement in query:
-        operator = statement[0]
-        if (operator == PROJECTION):
-            node = NodeProjection(statement[1:])
-
-        elif (operator == SELECTION):
-            node = NodeSelection(statement[1])
-
-        elif (operator == COUNT):
-            node = NodeCount()
-
-        elif (operator == DISTINCT):
-            node = NodeDistinct()
-
-        elif (operator == LIMIT):
-            node = NodeLimit(statement[1])
-
-        elif (operator == AVERAGE):
-            node = NodeAverage()
-
-        elif (operator == AGG_AVERAGE):
-            node = NodeAggAverage(statement[1], statement[2], statement[3])
-
-        elif (operator == FILE_SCAN):
-            node = NodeFileScan(statement[1:])
-
-        elif (operator == TEST_SCAN):
-            node = NodeTestScan()
-
+    for node in query:
         if root_node is None:
             root_node = node
             current_node = node
@@ -57,8 +29,9 @@ def process(query):
     root_node.close()
 
 query = [
-    [ AGG_AVERAGE, "rating", "averageRating", ["movieId"] ],
-    [ FILE_SCAN, "data/ratings_head.csv" ],
+    NodeLimit(10),
+    NodeAggAverage("rating", "averageRating", ["movieId"]),
+    NodeFileScan("data/ratings_head.csv" ),
 ]
 
 process(query)

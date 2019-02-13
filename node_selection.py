@@ -2,10 +2,10 @@ from constants import EQUALS
 from node import Node
 
 class NodeSelection(Node):
-    def __init__(self, args):
-        self.column = args[0]
-        self.comparator = args[1]
-        self.value = args[2]
+    def __init__(self, column, comparator, value):
+        self.column = column
+        self.comparator = comparator
+        self.value = value
 
     def next(self):
         row = self.child.next()

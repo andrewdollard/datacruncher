@@ -1,8 +1,8 @@
 from node import Node
 
 class NodeFileScan(Node):
-    def __init__(self, args):
-        self.file = open(args[0])
+    def __init__(self, filename):
+        self.file = open(filename)
         self.schema = self.file.readline().strip().split(',')
 
     def next(self):
