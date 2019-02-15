@@ -23,13 +23,14 @@ def process(query):
 
     root_node.close()
 
-
 q = [NodeLimit(3),
         [NodeProjection(["title"]),
             NodeFileScan("data/movies_head.csv")
     ] ]
 
-# [NodeSelect("title", EQUALS, "Medium Cool"),
-        # [NodeJoin("movieId", EQUALS, "id"), [NodeFileScan("data/ratings.csv"), NodeFileScan("data/movies.csv")] ] ]
+# q = [NodeSelect("title", EQUALS, "Medium Cool"),
+#         [NodeJoin("movieId", EQUALS, "id"),
+#             [NodeFileScan("data/ratings.csv"), NodeFileScan("data/movies.csv")],
+#     ] ]
 
 process(q)
