@@ -18,6 +18,6 @@ class Node:
             child.close()
 
     def next(self):
-        self.children[0].next()
+        return self.children[0].next()
 
 

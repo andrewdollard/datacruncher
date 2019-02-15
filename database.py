@@ -14,8 +14,8 @@ from node_test_scan import NodeTestScan
 
 
 def process(query):
-    root_node = query[0]
-    root_node.set_children(query[1:])
+    root_node = Node()
+    root_node.set_children([query])
 
     row = root_node.next()
     while row is not None:
