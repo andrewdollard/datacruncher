@@ -4,6 +4,7 @@ from node_agg_average import NodeAggAverage
 from node_average import NodeAverage
 from node_count import NodeCount
 from node_file_scan import NodeFileScan
+from node_join import NodeJoin
 from node_limit import NodeLimit
 from node_distinct import NodeDistinct
 from node_projection import NodeProjection
@@ -23,14 +24,19 @@ def process(query):
 
     root_node.close()
 
-q = [NodeLimit(3),
-        [NodeProjection(["title"]),
-            NodeFileScan("data/movies_head.csv")
-    ] ]
-
-# q = [NodeSelect("title", EQUALS, "Medium Cool"),
-#         [NodeJoin("movieId", EQUALS, "id"),
-#             [NodeFileScan("data/ratings.csv"), NodeFileScan("data/movies.csv")],
+# q = [NodeLimit(3),
+#         [NodeProjection(["title"]),
+#             NodeFileScan("data/movies_head.csv")
 #     ] ]
+
+# q = [NodeSelection("title", EQUALS, "Jumanji (1995)"),
+#         [ NodeJoin("movieId", EQUALS, "movieId"),
+#                 NodeFileScan("data/ratings_head.csv"), NodeFileScan("data/movies_head.csv"),
+#         ]
+#     ]
+
+q = [ NodeJoin("movieId", EQUALS, "movieId"),
+        NodeFileScan("data/movies_head.csv"), NodeFileScan("data/ratings_head.csv"),
+    ]
 
 process(q)
