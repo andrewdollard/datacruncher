@@ -2,6 +2,7 @@ from node import Node
 
 class NodeAggAverage(Node):
     def __init__(self, aggCol, asCol, groupingCols):
+        super().__init__()
         self.aggCol = aggCol
         self.asCol = asCol
         self.groupingCols = groupingCols
@@ -11,7 +12,7 @@ class NodeAggAverage(Node):
 
     def next(self):
         if not self.ran:
-            row = self.child.next()
+            row = self.children[0].next()
             while row is not None:
                 groupingKey = tuple([row[k] for k in self.groupingCols])
                 if groupingKey in self.runningAvgs.keys():
@@ -21,7 +22,7 @@ class NodeAggAverage(Node):
                     group = (1, float(row[self.aggCol]))
 
                 self.runningAvgs[groupingKey] = group
-                row = self.child.next()
+                row = self.children[0].next()
             self.ran = True
 
         keys = list(self.runningAvgs.keys())

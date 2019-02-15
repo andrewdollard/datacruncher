@@ -1,4 +1,5 @@
 from constants import *
+from node import Node
 from node_agg_average import NodeAggAverage
 from node_average import NodeAverage
 from node_count import NodeCount
@@ -10,17 +11,10 @@ from node_selection import NodeSelection
 from node_sort import NodeSort
 from node_test_scan import NodeTestScan
 
-def process(query):
-    current_node = None
-    root_node = None
 
-    for node in query:
-        if root_node is None:
-            root_node = node
-            current_node = node
-        else:
-            current_node.set_child(node)
-            current_node = node
+def process(query):
+    root_node = query[0]
+    root_node.set_children(query[1:])
 
     row = root_node.next()
     while row is not None:
@@ -29,11 +23,13 @@ def process(query):
 
     root_node.close()
 
-query = [
-    NodeLimit(10),
-    NodeSort('averageRating'),
-    NodeAggAverage("rating", "averageRating", ["movieId"]),
-    NodeFileScan("data/ratings.csv" ),
-]
 
-process(query)
+q = [NodeLimit(3),
+        [NodeProjection(["title"]),
+            NodeFileScan("data/movies_head.csv")
+    ] ]
+
+# [NodeSelect("title", EQUALS, "Medium Cool"),
+        # [NodeJoin("movieId", EQUALS, "id"), [NodeFileScan("data/ratings.csv"), NodeFileScan("data/movies.csv")] ] ]
+
+process(q)

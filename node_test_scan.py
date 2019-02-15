@@ -8,6 +8,7 @@ class NodeTestScan(Node):
     ]
 
     def __init__(self):
+        super().__init__()
         self.idx = 3
 
     def next(self):

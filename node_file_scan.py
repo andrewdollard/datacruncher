@@ -2,6 +2,7 @@ from node import Node
 
 class NodeFileScan(Node):
     def __init__(self, filename):
+        super().__init__()
         self.file = open(filename)
         self.schema = self.file.readline().strip().split(',')
 
