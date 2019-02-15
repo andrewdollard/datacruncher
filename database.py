@@ -35,8 +35,17 @@ def process(query):
 #         ]
 #     ]
 
-q = [ NodeJoin("movieId", EQUALS, "movieId"),
-        NodeFileScan("data/movies_head.csv"), NodeFileScan("data/ratings_head.csv"),
+# q = [ NodeJoin("movieId", EQUALS, "movieId"),
+#         NodeFileScan("data/movies_head.csv"), NodeFileScan("data/ratings_head.csv"),
+#     ]
+
+q = [ NodeAverage(),
+        [ NodeProjection(["rating"]),
+            [ NodeJoin("movieId", EQUALS, "movieId"),
+                [ NodeSelection("title", EQUALS, "Jumanji (1995)"), NodeFileScan("data/movies_head.csv")],
+                NodeFileScan("data/ratings_head.csv"),
+            ]
+        ]
     ]
 
 process(q)
