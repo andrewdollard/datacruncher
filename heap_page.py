@@ -8,13 +8,18 @@ class HeapPage:
     def __init__(self):
         self.tuples = []
 
-    def read(inp):
+    def read(self, inp):
         i = 0
-        ptr = inp[ i : i+1 ]
-        len = inp[ i+2 : i+3 ]
-        while ptr is not 0:
-            raw_tup = inp[ ptr : ptr+len ]
-            self.tuples.append(tuple(raw_tup.split(',')))
+        ptr = int.from_bytes(inp[ i:i+2 ], byteorder='big')
+        tlen = int.from_bytes(inp[ i+2 : i+4 ], byteorder='big')
+
+        while ptr != 0:
+            raw_tup = inp[ ptr : ptr+tlen ]
+            self.tuples.append(tuple(raw_tup.decode('utf-8').split(',')))
+
+            i += 4
+            ptr = int.from_bytes(inp[ i:i+2 ], byteorder='big')
+            tlen = int.from_bytes(inp[ i+2 : i+4 ], byteorder='big')
 
     def write(self, tuples):
         output = bytearray(PAGE_SIZE_BYTES)
@@ -40,5 +45,7 @@ class HeapPage:
 if __name__ == '__main__':
     tuples = [(1,2), (3,4)]
     hp = HeapPage()
-    print(hp.write(tuples))
+    page = hp.write(tuples)
+    hp.read(page)
+    print(hp.tuples)
 
