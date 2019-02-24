@@ -26,6 +26,6 @@ def load(in_filename, out_filename):
 
 if __name__ == '__main__':
     load('data/movies.csv', 'data/movies.dc')
-    load('data/ratings.csv', 'data/ratings.dc')
+    # load('data/ratings.csv', 'data/ratings.dc')
 
 

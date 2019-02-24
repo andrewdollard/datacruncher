@@ -37,7 +37,7 @@ class HeapPage:
 
             new_ptr_offset = self.ptr_offset + 4
             new_tpl_offset = self.tpl_offset - tpl_bytes_len
-            if new_ptr_offset + 1 > new_tpl_offset:
+            if new_ptr_offset + 2 > new_tpl_offset:
                 return False
 
             self.tpl_offset = new_tpl_offset
