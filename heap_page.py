@@ -1,12 +1,19 @@
 import pdb
 from functools import reduce
 
-PAGE_SIZE_BYTES = 128
+PAGE_SIZE_BYTES = 2**10
 
 class HeapPage:
 
     def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.ptr_offset = 0
+        self.tpl_offset = PAGE_SIZE_BYTES
+
         self.tuples = []
+        self.bytes = bytearray(PAGE_SIZE_BYTES)
 
     def read(self, inp):
         i = 0
@@ -21,31 +28,31 @@ class HeapPage:
             ptr = int.from_bytes(inp[ i:i+2 ], byteorder='big')
             tlen = int.from_bytes(inp[ i+2 : i+4 ], byteorder='big')
 
-    def write(self, tuples):
-        output = bytearray(PAGE_SIZE_BYTES)
+        self.bytes = inp
 
-        tuple_strings = [','.join([str(el) for el in t]) for t in tuples]
-        total_tuples_bytes = reduce(lambda sum, t: sum + len(t.encode('utf-8')), tuple_strings, 0)
+    def append(self, tuple):
+            tpl_string = ','.join([str(el) for el in tuple])
+            tpl_bytes = bytearray(tpl_string, 'utf-8')
+            tpl_bytes_len = len(tpl_bytes)
 
-        pointer_offset = 0
-        tuple_offset = PAGE_SIZE_BYTES - total_tuples_bytes
+            new_ptr_offset = self.ptr_offset + 4
+            new_tpl_offset = self.tpl_offset - tpl_bytes_len
+            if new_ptr_offset + 1 > new_tpl_offset:
+                return False
 
-        for i in range(len(tuple_strings)):
-            output[pointer_offset : pointer_offset + 2] = tuple_offset.to_bytes(2, byteorder='big')
-            tuple_length = len(tuple_strings[i].encode('utf-8'))
-            output[pointer_offset + 2 : pointer_offset + 4] = tuple_length.to_bytes(2, byteorder='big')
+            self.tpl_offset = new_tpl_offset
 
-            output[tuple_offset : tuple_offset + tuple_length] = bytearray(tuple_strings[i], 'utf-8')
+            self.bytes[self.ptr_offset : self.ptr_offset + 2] = self.tpl_offset.to_bytes(2, byteorder='big')
+            self.bytes[self.ptr_offset + 2 : self.ptr_offset + 4] = tpl_bytes_len.to_bytes(2, byteorder='big')
+            self.bytes[self.tpl_offset : self.tpl_offset + tpl_bytes_len] = tpl_bytes
+            self.tuples.append(tuple)
 
-            pointer_offset += 4
-            tuple_offset += tuple_length
-
-        return output
+            self.ptr_offset = new_ptr_offset
+            return True
 
 if __name__ == '__main__':
-    tuples = [(1,2), (3,4)]
     hp = HeapPage()
-    page = hp.write(tuples)
-    hp.read(page)
-    print(hp.tuples)
+    hp.append((1,2))
+    hp.append((4,5))
+    print(hp.bytes)
 
