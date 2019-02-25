@@ -7,3 +7,9 @@ implementing B-Tree index:
   implement binary format for index nodes
   scan sorted heap file and build index
 
+options for cleanly reading sorted page sections in intermediary files:
+  * make all columns fixed size, so that all pages contain precisely the same number of records
+  * keep a data structure between each iteration, with pointers to each section
+  * include a waypoint record that points to the next sorted section
+
+
