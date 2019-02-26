@@ -3,9 +3,10 @@ import os
 
 def load(in_filename, out_filename):
     in_file = open(in_filename, 'r')
+
     out_file = open(out_filename, 'wb')
 
-    hp = HeapPage()
+    hp = HeapPage(4)
 
     schema = in_file.readline().strip()
     line = in_file.readline().strip()

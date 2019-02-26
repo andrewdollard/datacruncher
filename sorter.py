@@ -7,7 +7,7 @@ def sort(in_filename, out_filename):
     tmp_file = open('sort_temp', 'wb')
     page_count = 0
 
-    hp = HeapPage()
+    hp = HeapPage(4)
 
     page_bytes = in_file.read(PAGE_SIZE_BYTES)
     while page_bytes != b'':
@@ -40,7 +40,7 @@ def sort(in_filename, out_filename):
         out_filename = base_out_filename + '.' + str(itr)
         out_file = open(out_filename, 'wb')
 
-        output_page_buffer = HeapPage()
+        output_page_buffer = HeapPage(4)
 
         left_page_pos = 0
         right_page_pos = chunk_size_in_pages
@@ -89,11 +89,10 @@ def do_append(buf, tpl, out_file):
     if not buf.append(tpl):
         flush(buf, out_file)
         buf.append(tpl)
-    print(f"appended: {tpl}")
 
 def flush(buf, out_file):
-    print("flushing")
     if len(buf.tuples) > 0:
+        print(f"flushing {len(buf.tuples)} tuples")
         out_file.write(buf.bytes)
         buf.reset()
 
@@ -104,7 +103,7 @@ class TuplePuller:
         self.page_start = page_start
         self.chunk_size = chunk_size
         self.next_page = page_start
-        self.page_buffer = HeapPage()
+        self.page_buffer = HeapPage(4)
         self.tpl_idx = 0
 
     def next_tpl(self):
@@ -122,8 +121,7 @@ class TuplePuller:
                 return None
             self.page_buffer.reset()
             self.page_buffer.read(page_bytes)
-            print("loaded tuples:")
-            [print(t) for t in self.page_buffer.tuples]
+            print(f"loaded {len(self.page_buffer.tuples)} tuples")
 
             self.tpl_idx = 0
             result = self.page_buffer.tuples[self.tpl_idx]

@@ -5,8 +5,9 @@ PAGE_SIZE_BYTES = 2**10
 
 class HeapPage:
 
-    def __init__(self):
+    def __init__(self, max_tpl_count):
         self.reset()
+        self.max_tpl_count = max_tpl_count
 
     def reset(self):
         self.ptr_offset = 0
@@ -31,14 +32,15 @@ class HeapPage:
         self.bytes = inp
 
     def append(self, tuple):
+            if len(self.tuples) >= self.max_tpl_count:
+                return False
+
             tpl_string = ','.join([str(el) for el in tuple])
             tpl_bytes = bytearray(tpl_string, 'utf-8')
             tpl_bytes_len = len(tpl_bytes)
 
             new_ptr_offset = self.ptr_offset + 4
             new_tpl_offset = self.tpl_offset - tpl_bytes_len
-            if new_ptr_offset + 2 > new_tpl_offset:
-                return False
 
             self.tpl_offset = new_tpl_offset
 
