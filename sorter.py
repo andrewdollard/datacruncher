@@ -1,13 +1,14 @@
 import operator
+import os
 import pdb
 from heap_page import HeapPage, PAGE_SIZE_BYTES
 
-def sort(in_filename, out_filename):
+def sort(in_filename, orig_out_filename):
     in_file = open(in_filename, 'rb')
     tmp_file = open('sort_temp', 'wb')
     page_count = 0
 
-    hp = HeapPage(4)
+    hp = HeapPage(36)
 
     page_bytes = in_file.read(PAGE_SIZE_BYTES)
     while page_bytes != b'':
@@ -30,17 +31,16 @@ def sort(in_filename, out_filename):
     itr = 0
     chunk_size_in_pages = 1
     in_filename = 'sort_temp'
-    base_out_filename = out_filename
+    base_out_filename = orig_out_filename
 
     while chunk_size_in_pages < page_count:
-
         print(f"starting iteration with chunk size {chunk_size_in_pages}")
         itr += 1
         in_file = open(in_filename, 'rb')
         out_filename = base_out_filename + '.' + str(itr)
         out_file = open(out_filename, 'wb')
 
-        output_page_buffer = HeapPage(4)
+        output_page_buffer = HeapPage(36)
 
         left_page_pos = 0
         right_page_pos = chunk_size_in_pages
@@ -81,9 +81,12 @@ def sort(in_filename, out_filename):
             right_page_pos = left_page_pos + chunk_size_in_pages
 
         chunk_size_in_pages = chunk_size_in_pages * 2
+        os.remove(in_filename)
         in_filename = out_filename
         in_file.close()
         out_file.close()
+
+    os.rename(out_filename, orig_out_filename)
 
 def do_append(buf, tpl, out_file):
     if not buf.append(tpl):
@@ -103,7 +106,7 @@ class TuplePuller:
         self.page_start = page_start
         self.chunk_size = chunk_size
         self.next_page = page_start
-        self.page_buffer = HeapPage(4)
+        self.page_buffer = HeapPage(36)
         self.tpl_idx = 0
 
     def next_tpl(self):
@@ -122,6 +125,7 @@ class TuplePuller:
             self.page_buffer.reset()
             self.page_buffer.read(page_bytes)
             print(f"loaded {len(self.page_buffer.tuples)} tuples")
+            [print(t) for t in self.page_buffer.tuples]
 
             self.tpl_idx = 0
             result = self.page_buffer.tuples[self.tpl_idx]
@@ -133,16 +137,16 @@ class TuplePuller:
 
 
 if __name__ == '__main__':
-    # sort('data/movies.dc', 'data/movies_sorted.dc')
+    sort('data/movies.dc', 'data/movies_sorted.dc')
 
-    tp = TuplePuller(open('data/movies_sorted.dc.11', 'rb'), 0, 1600)
-    tpl1 = tp.next_tpl()
-    tpl2 = tp.next_tpl()
-
-    while tpl2 is not None:
-        if tpl1[1] > tpl2[1]:
-            print(f"out of order: {tpl1[1]}, {tpl2[1]}")
-
-        tpl1 = tpl2
-        tpl2 = tp.next_tpl()
-
+    # tp = TuplePuller(open('data/movies_sorted.dc', 'rb'), 0, 1600)
+    # tpl1 = tp.next_tpl()
+    # tpl2 = tp.next_tpl()
+    #
+    # while tpl2 is not None:
+    #     if tpl1[1] > tpl2[1]:
+    #         print(f"out of order: {tpl1[1]}, {tpl2[1]}")
+    #
+    #     tpl1 = tpl2
+    #     tpl2 = tp.next_tpl()
+    #

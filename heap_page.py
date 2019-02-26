@@ -1,7 +1,9 @@
 import pdb
+import csv
 from functools import reduce
+from io import StringIO
 
-PAGE_SIZE_BYTES = 2**10
+PAGE_SIZE_BYTES = 2**13
 
 class HeapPage:
 
@@ -23,7 +25,11 @@ class HeapPage:
 
         while ptr != 0:
             raw_tup = inp[ ptr : ptr+tlen ]
-            self.tuples.append(tuple(raw_tup.decode('utf-8').split(',')))
+            raw_csv = raw_tup.decode('utf-8')
+            inp_io = StringIO(raw_csv)
+            reader = csv.reader(inp_io)
+            tpl = tuple(next(reader))
+            self.tuples.append(tpl)
 
             i += 4
             ptr = int.from_bytes(inp[ i:i+2 ], byteorder='big')
@@ -31,11 +37,15 @@ class HeapPage:
 
         self.bytes = inp
 
-    def append(self, tuple):
+    def append(self, tpl):
             if len(self.tuples) >= self.max_tpl_count:
                 return False
 
-            tpl_string = ','.join([str(el) for el in tuple])
+            output = StringIO()
+            writer = csv.writer(output)
+            writer.writerow(list(tpl))
+            tpl_string = output.getvalue().strip()
+
             tpl_bytes = bytearray(tpl_string, 'utf-8')
             tpl_bytes_len = len(tpl_bytes)
 
